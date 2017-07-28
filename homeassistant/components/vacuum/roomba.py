@@ -7,16 +7,14 @@ https://home-assistant.io/components/vacuum.roomba/
 from functools import partial
 import asyncio
 import logging
-import os
 import voluptuous as vol
 
 import homeassistant.helpers.config_validation as cv
 from homeassistant.components.vacuum import (
-    VacuumDevice, DOMAIN,
+    VacuumDevice,
     PLATFORM_SCHEMA, SUPPORT_TURN_ON, SUPPORT_TURN_OFF, SUPPORT_PAUSE,
     SUPPORT_STOP, SUPPORT_RETURN_HOME, SUPPORT_BATTERY, SUPPORT_STATUS,
     SUPPORT_SENDCOMMAND)
-from homeassistant.config import load_yaml_config_file
 from homeassistant.const import (
     STATE_ON, STATE_OFF, CONF_NAME, CONF_HOST, CONF_USERNAME, CONF_PASSWORD)
 
