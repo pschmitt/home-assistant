@@ -273,11 +273,14 @@ class RoombaVacuum(VacuumDevice):
         # Set properties that are to appear in the GUI
         self._state_attrs = {
             'Bin Present': bin_state.get('present', None),
-            'Error': error_msg,
             'Cleaning time': cleaning_time,
             'Cleaned area': cleaned_area,
             'Software Version': software_version
         }
+        # Skip error attr if there is none
+        if error_msg and error_msg != 'None':
+            self._state_attrs['Error'] = error_msg
+
         # Not all Roombas expose positon data
         # https://github.com/koalazak/dorita980/issues/48
         if cap_pos == 1:
