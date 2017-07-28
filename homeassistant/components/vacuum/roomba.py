@@ -13,18 +13,12 @@ import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
 from homeassistant.components.vacuum import (
     VacuumDevice, DOMAIN,
-    PLATFORM_SCHEMA, VACUUM_SERVICE_SCHEMA,
-    SUPPORT_TURN_ON, SUPPORT_TURN_OFF, SUPPORT_PAUSE, SUPPORT_STOP,
-    SUPPORT_RETURN_HOME, SUPPORT_BATTERY, SUPPORT_STATUS, SUPPORT_SENDCOMMAND)
+    PLATFORM_SCHEMA, SUPPORT_TURN_ON, SUPPORT_TURN_OFF, SUPPORT_PAUSE,
+    SUPPORT_STOP, SUPPORT_RETURN_HOME, SUPPORT_BATTERY, SUPPORT_STATUS,
+    SUPPORT_SENDCOMMAND)
 from homeassistant.config import load_yaml_config_file
 from homeassistant.const import (
-    ATTR_ENTITY_ID, STATE_ON, STATE_OFF,
-    CONF_NAME, CONF_HOST, CONF_TOKEN, CONF_SENSORS, CONF_USERNAME,
-    CONF_PASSWORD)
-from homeassistant.core import callback
-from homeassistant.helpers.discovery import async_load_platform
-from homeassistant.helpers.entity import Entity
-from homeassistant.util.icon import icon_for_battery_level
+    STATE_ON, STATE_OFF, CONF_NAME, CONF_HOST, CONF_USERNAME, CONF_PASSWORD)
 
 REQUIREMENTS = ['https://github.com/pschmitt/Roomba980-Python/archive/'
                 '1.2.1.zip'
@@ -69,7 +63,6 @@ def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
     password = config.get(CONF_PASSWORD)
     certificate = config.get(CONF_CERT)
     continuous = config.get(CONF_CONTINUOUS)
-    sensors = config.get(CONF_SENSORS)
 
     # Create handler
     roomba = RoombaVacuum(
@@ -154,30 +147,28 @@ class RoombaVacuum(VacuumDevice):
             from roomba import Roomba
             _LOGGER.info("Initializing with host %s (username: %s...)",
                          self._host, self._username)
-            try:
-                self._vacuum = Roomba(
-                    address=self._host,
-                    blid=self._username,
-                    password=self._password,
-                    cert_name=self._certificate,
-                    continuous=self._continuous
-                )
-                self._vacuum.connect()
-            except Exception as e:
-                _LOGGER.error('ROOMBA ERROR: %s %s', type(e), e)
+            # FIXME Error handling is not currently possible since Roomba()
+            # does not raise any exception on failure
+            # https://github.com/NickWaterton/Roomba980-Python/issues/8
+            self._vacuum = Roomba(
+                address=self._host,
+                blid=self._username,
+                password=self._password,
+                cert_name=self._certificate,
+                continuous=self._continuous
+            )
+            self._vacuum.connect()
 
         return self._vacuum
 
     @asyncio.coroutine
     def _try_command(self, mask_error, func, *args, **kwargs):
         """Call a vacuum command handling error messages."""
-        try:
-            yield from self.hass.async_add_job(partial(func, *args, **kwargs))
-            return True
-        # FIXME
-        except Exception as ex:
-            _LOGGER.error(mask_error, ex)
-            return False
+        # FIXME Error handling is not currently possible since Roomba()
+        # does not raise any exception on failure
+        # https://github.com/NickWaterton/Roomba980-Python/issues/8
+        yield from self.hass.async_add_job(partial(func, *args, **kwargs))
+        return True
 
     @asyncio.coroutine
     def async_turn_on(self, **kwargs):
