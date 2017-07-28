@@ -202,19 +202,19 @@ class RoombaVacuum(VacuumDevice):
             "Unable to stop: %s", self.vacuum.send_command, 'stop')
 
     @asyncio.coroutine
-    def async_cleaning_play_pause(self, **kwargs):
+    def async_start_pause(self, **kwargs):
         """Pause the cleaning task or replay it."""
         if self.vacuum_state and self.is_on:
             yield from self._try_command(
-                'Unable to set play/pause (pause): %s',
+                'Unable to start/pause (pause): %s',
                 self.vacuum.send_command, 'pause')
         elif self._status == 'Stopped':
             yield from self._try_command(
-                'Unable to set play/pause (resume): %s',
+                'Unable to start/pause (resume): %s',
                 self.vacuum.send_command, 'resume')
-        else:
+        else:  # vacuum is off
             yield from self._try_command(
-                'Unable to set play/pause (start): %s',
+                'Unable to start/pause (start): %s',
                 self.vacuum.send_command, 'start')
 
     @asyncio.coroutine
