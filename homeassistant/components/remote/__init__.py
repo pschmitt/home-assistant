@@ -18,14 +18,13 @@ from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.entity import ToggleEntity
 import homeassistant.helpers.config_validation as cv
 from homeassistant.const import (
-    STATE_ON, SERVICE_TURN_ON, SERVICE_TURN_OFF, ATTR_ENTITY_ID)
+    ATTR_COMMAND, ATTR_ENTITY_ID, SERVICE_TURN_ON, SERVICE_TURN_OFF, STATE_ON)
 from homeassistant.components import group
 from homeassistant.helpers.config_validation import PLATFORM_SCHEMA  # noqa
 
 _LOGGER = logging.getLogger(__name__)
 
 ATTR_ACTIVITY = 'activity'
-ATTR_COMMAND = 'command'
 ATTR_DEVICE = 'device'
 ATTR_NUM_REPEATS = 'num_repeats'
 ATTR_DELAY_SECS = 'delay_secs'
