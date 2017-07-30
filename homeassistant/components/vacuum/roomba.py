@@ -249,14 +249,6 @@ class RoombaVacuum(VacuumDevice):
 
         bin_state = state.get('bin', {})
 
-        # Get clean mission status
-        mission_state = state.get('cleanMissionStatus', {})
-        cleaning_time = mission_state.get('mssnM', None)
-        cleaned_area = mission_state.get('sqft', None)  # Imperial
-        # Convert to m2 if the unit_system is set to metric
-        if cleaned_area and self._metric:
-            cleaned_area = round(cleaned_area * 0.0929)
-
         # Roomba software version
         software_version = state.get('softwareVer', None)
 
@@ -270,10 +262,22 @@ class RoombaVacuum(VacuumDevice):
         # Set properties that are to appear in the GUI
         self._state_attrs = {
             ATTR_BIN_PRESENT: bin_state.get('present', None),
-            ATTR_CLEANING_TIME: cleaning_time,
-            ATTR_CLEANED_AREA: cleaned_area,
             ATTR_SOFTWARE_VERSION: software_version
         }
+
+        # Only add cleaning time and cleaned area attrs when the vacuum is
+        # currently on
+        if self._is_on:
+            # Get clean mission status
+            mission_state = state.get('cleanMissionStatus', {})
+            cleaning_time = mission_state.get('mssnM', None)
+            cleaned_area = mission_state.get('sqft', None)  # Imperial
+            # Convert to m2 if the unit_system is set to metric
+            if cleaned_area and self._metric:
+                cleaned_area = round(cleaned_area * 0.0929)
+            self._state_attrs[ATTR_CLEANING_TIME] = cleaning_time
+            self._state_attrs[ATTR_CLEANED_AREA] = cleaned_area
+
         # Skip error attr if there is none
         if error_msg and error_msg != 'None':
             self._state_attrs[ATTR_ERROR] = error_msg
@@ -289,6 +293,7 @@ class RoombaVacuum(VacuumDevice):
             if all(item is not None for item in [pos_x, pos_y, theta]):
                 position = '({}, {}, {})'.format(pos_x, pos_y, theta)
             self._state_attrs[ATTR_POSITION] = position
+
         # Not all Roombas have a bin full sensor
         if cap_bin_full == 1:
             self._state_attrs[ATTR_BIN_FULL] = bin_state.get('full', None)
