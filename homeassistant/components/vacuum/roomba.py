@@ -24,6 +24,14 @@ REQUIREMENTS = ['https://github.com/pschmitt/Roomba980-Python/archive/'
 
 _LOGGER = logging.getLogger(__name__)
 
+ATTR_BIN_FULL = 'bin_full'
+ATTR_BIN_PRESENT = 'bin_present'
+ATTR_CLEANING_TIME = 'cleaning_time'
+ATTR_CLEANED_AREA = 'cleaned_area'
+ATTR_ERROR = 'error'
+ATTR_POSITION = 'position'
+ATTR_SOFTWARE_VERSION = 'software_version'
+
 CONF_CERT = 'certificate'
 CONF_CONTINUOUS = 'continuous'
 
@@ -261,14 +269,14 @@ class RoombaVacuum(VacuumDevice):
 
         # Set properties that are to appear in the GUI
         self._state_attrs = {
-            'Bin Present': bin_state.get('present', None),
-            'Cleaning time': cleaning_time,
-            'Cleaned area': cleaned_area,
-            'Software Version': software_version
+            ATTR_BIN_PRESENT: bin_state.get('present', None),
+            ATTR_CLEANING_TIME: cleaning_time,
+            ATTR_CLEANED_AREA: cleaned_area,
+            ATTR_SOFTWARE_VERSION: software_version
         }
         # Skip error attr if there is none
         if error_msg and error_msg != 'None':
-            self._state_attrs['Error'] = error_msg
+            self._state_attrs[ATTR_ERROR] = error_msg
 
         # Not all Roombas expose positon data
         # https://github.com/koalazak/dorita980/issues/48
@@ -280,7 +288,7 @@ class RoombaVacuum(VacuumDevice):
             theta = pos_state.get('theta', None)
             if all(item is not None for item in [pos_x, pos_y, theta]):
                 position = '({}, {}, {})'.format(pos_x, pos_y, theta)
-            self._state_attrs['Position'] = position
+            self._state_attrs[ATTR_POSITION] = position
         # Not all Roombas have a bin full sensor
         if cap_bin_full == 1:
-            self._state_attrs['Bin Full'] = bin_state.get('full', None)
+            self._state_attrs[ATTR_BIN_FULL] = bin_state.get('full', None)
